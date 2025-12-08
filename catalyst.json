@@ -1,0 +1,8 @@
+{
+  "appsail": [
+    {
+      "source": "docker://php-rest-api:latest",
+      "name": "php-appsail"
+    }
+  ]
+}
