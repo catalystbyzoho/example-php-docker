@@ -44,10 +44,61 @@ switch ($requestUri) {
 // Handle empty root endpoint
 function handleEmpty($method) {
     if ($method === 'GET') {
+        // Override default JSON header for HTML response
+        header('Content-Type: text/html; charset=utf-8');
+
+        $endpoints = [
+            ['method' => 'GET', 'path' => '/', 'desc' => 'Welcome page'],
+            ['method' => 'GET', 'path' => '/api/health', 'desc' => 'Health check'],
+            ['method' => 'GET', 'path' => '/api/users', 'desc' => 'List users'],
+            ['method' => 'POST', 'path' => '/api/users', 'desc' => 'Create user'],
+            ['method' => 'GET', 'path' => '/api/products', 'desc' => 'List products (optional ?id=)'],
+            ['method' => 'POST', 'path' => '/api/products', 'desc' => 'Create product'],
+        ];
+
+        $rows = '';
+        foreach ($endpoints as $ep) {
+            $rows .= '<tr>'
+                . '<td><code>' . htmlspecialchars($ep['method']) . '</code></td>'
+                . '<td><code>' . htmlspecialchars($ep['path']) . '</code></td>'
+                . '<td>' . htmlspecialchars($ep['desc']) . '</td>'
+                . '</tr>';
+        }
+
+        $html = <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PHP API</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 32px; color: #1f2933; }
+    h1 { margin-bottom: 4px; }
+    p  { margin-top: 4px; color: #52606d; }
+    table { border-collapse: collapse; margin-top: 16px; width: 100%; max-width: 720px; }
+    th, td { border: 1px solid #e0e7ef; padding: 10px; text-align: left; }
+    th { background: #f7f9fc; }
+    code { background: #f1f5f9; padding: 2px 4px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>PHP API</h1>
+  <p>Available endpoints and methods:</p>
+  <table>
+    <thead>
+      <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      $rows
+    </tbody>
+  </table>
+</body>
+</html>
+HTML;
+
         http_response_code(200);
-        echo json_encode([
-            'message' => 'Welcome to the PHP API. Available endpoints: /api/users, /api/products, /api/health'
-        ]);
+        echo $html;
     } else {
         http_response_code(405);
         echo json_encode(['error' => 'Method not allowed']);
